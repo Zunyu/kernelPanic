@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
+
+
+int main(int argc, char **argv) {
+
+	int pFile;
+	FILE * obstacle;
+	int pp;
+	int flag = 0;
+	char buf[1024], buff[1024];
+	printf("senddata\n");
+
+	pp = open("/dev/rfcomm0", O_RDWR);
+		if (pp < 0) {
+			fprintf (stderr, "rfcomm0 module isn't loaded\n");
+			return 1;
+		} else printf("open success\n");	
+	while(1) {
+		sleep(1);		
+		printf("begin to work\n");
+		if(flag == 0) {		
+			pFile = open("/home/posdata.txt", O_RDWR);
+			if (pFile >= 0) {
+				memset(buff, 0, sizeof(buff));
+				read(pFile, buff, sizeof(buff));
+				printf("senddata[%s]\n", buff);
+				write(pp, buff, sizeof(buff));
+				flag = 1;
+				printf("flag = %d\n", flag);
+				close(pFile);
+
+			}
+    		}
+		close(pp);
+		pp = open("/dev/rfcomm0", O_RDWR);
+		if (flag == 1) {		
+			if (read(pp, buf, sizeof(buf)) > 0){
+				obstacle = fopen("/home/Location.txt", "w+");
+				printf("%s\n", buf);
+				fwrite(buf, sizeof(buf), 1, obstacle);
+				fclose(obstacle);
+				flag = 0;
+				printf("flag = %d\n", flag);
+			}
+		}
+	}
+	return 0;
+}

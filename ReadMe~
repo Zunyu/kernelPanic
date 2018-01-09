@@ -1,0 +1,162 @@
+***************************************** EC535 Project*************************************************
+This was a class project completed for EC535 at Boston University. We built a smart vehicle which is able
+to be remotely controlled by users via Bluetooth transfer and touch screen interaction.  
+
+Project group  members are: Jiao Yang, Yue Sun, Yu Jun.
+
+Class: Intro to Embedded Systems EC535
+
+Please see the uploaded report which contains a detailed explanation of the project.
+
+included:
+
+QT:checklocthread.cpp checklocthread.h locationdlg.cpp locationdlg.h main.cpp mainwindow.cpp mainwindow.h 
+mainwindow.ui kernelpanicimg.qrc knpnc.qrc rsc.qrc
+
+***************************************** Setup Instruction *************************************************
+=============================================================================================================
+This document serves as a setup instruction for users to build up the controlling system. They could follow 
+this instruction to setup both hardware and software.
+=============================================================================================================
+
+ ====================
+|                    |
+|   Hardware Setup   |
+|                    |
+ ====================
+
+list of hardware:
+         
+        |                                 |
+        | Gumstix board              x 2  |
+        | ActivityBot Robot Kit      x 1  |
+        | AA Batteries               x 4  |
+        | Ultrasound sensor          x 1  |
+        | Bluetooth Module           x 2  |
+        | LCD touch screen           x 1  |
+        | serial cable               x 2  |
+        | wires                      x n  |
+
+
+for two Gumstix board:
+
+1.  attach LCD screen to the one of gumstix board and then attach this board to the console.
+
+2.  connect gumstix board to the borad on ActivityBot Robot Kit via i2c and AC97:
+
+3.  attach ultrasound sensor to the the ActivityBot Robot Kit.
+
+5.  connect serial cable with the middle serial port socket.
+
+6.  plug in DC power for Gumstix board.
+
+========================================================================================================================================================
+
+ ====================
+|                    |
+|   Software Setup   |
+|                    |
+ ====================
+
+for LCD Gumstix board:
+
+QT codes are located in /sourcecodes/kernelpaniccqt
+
+0.QT compiling:
+	create .pro file:
+		qmake -project
+	create Makefile:
+		qmake
+	modify Makefile:
+		change INCPATH to:
+		INCPATH = -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++ \
+	              -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++/arm-angstrom-linux-gnueabi \
+	              -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++/backward \
+	              -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++/bits \
+	              -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++/debug \
+	              -I/ad/eng/courses/ec/ec535/gumstix/oe/cross/arm-angstrom-linux-gnueabi/include/c++/ext \
+	              -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include/QtCore \
+	              -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include/QtGui \
+	              -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include/QtNetwork \
+	              -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/include \
+	              -I/ad/eng/courses/ec/ec535/gumstix/oe/qt/mkspecs/qws/linux-arm-g++ -I. -I. -I. -I.
+	create binary:
+		make
+	
+
+1.  open terminal, enter minicom.
+
+2.  open minicom, use rz -bZ command to transfer /kernelpnic to "/home" the Gumstix board.
+	copy libraries into a sd card via zmodem:
+		sd card is in /media/card on gumstix
+		create a folder called lib
+		copy following: "fonts libQtCore.so.4 libQtGui.so.4 libQtNetwork.so.4 ld-uClibc.so.0 libc.so.0 libm.so.0 libstdc++.so.6"
+			from folder: /ad/eng/courses/ec/ec535/gumstix/oe/qt/lib
+			from folder: /ad/eng/courses/ec/ec535/arm-linux/lib
+			into /media/card/lib/
+	create library links in gumstix:
+		cd /usr/lib
+		ln -s /media/card/lib/libQtCore.so.4 libQtCore.so.4
+		ln -s /media/card/lib/libQtGui.so.4 libQtGui.so.4
+		ln -s /media/card/lib/libQtNetwork.so.4 libQtNetwork.so.4
+		ln -s /media/card/lib/ld-uClibc.so.0 ld-uClibc.so.0
+		ln -s /media/card/lib/libc.so.0 libc.so.0
+		ln -s /media/card/lib/libm.so.0 libm.so.0
+		ln -s /media/card/lib/libstdc\+\+.so.6 libstdc\+\+.so.6
+	export some variables in gumstix:
+		export QWS_MOUSE_PROTO='tslib:/dev/input/touchscreen0'
+		export TSLIB_CONFFILE=/etc/ts.conf
+		export TSLIB_PLUGINDIR=/usr/lib
+		export TSLIB_TSDEVICE=/dev/input/event0
+		export TSLIB_FBDEVICE=/dev/fb0
+		export TSLIB_CONSOLEDEVICE=/dev/tty
+		export QT_QWS_FONTDIR=/media/card/lib/fonts
+		export TSLIB_PLUGINDIR=/usr/lib/ts
+	calibrate touchscreen:
+		ts_calibrate
+
+
+==============================================================================================================================================================
+for Vehicle Gumstix board mode:
+
+1. cd to 'sourcecodes/IntelligentVehicle'
+
+2. use makefile to make and copy IntelligentVehicle.ko to gumstix
+
+3. type in gumstix as below:
+
+	mknod /dev/IntelligentVehicle c 61 0
+	insmod IntelligentVehicle.ko
+
+4. the .c file in 'sourcecodes/VehicleDriving' should be complied and downloaded to the vehicle by an IDE called SimpleIDE which is offered by the producer
+of the vehicle, i.e. the producer of P8X32A.
+
+5. GPIO connections are described in the report PDF.
+GPIO28:		interrupt of OBSTACLE_DETECT
+GPIO29:		D0, degree0, i.e. LSB of angle info
+GPIO30:		D1, degree1, i.e. 2nd bit of angle info
+GPIO31:		D2, degree2, i.e. 3rd bit of angle info
+GPIO101:	D3, degree3, i.e. 4th bit of angle info
+GPIO113:	D4, degree4, I.e MSB of angle info
+GPIO17:		S, direction, 0 for clockwise and 1 for counterclockwise
+
+============================================================================================================================================================
+for two Gumstix boards mode:
+
+1.   open terminal and type "source /ad/eng/courses/ec/ec535/bashrc_ec535" and go to "cd /bluetooth" 
+     type "arm-linux-gcc bluetooth_contl.c -o bl_contl" and "arm-linux-gcc bluetooth_car.c -o bl_car"
+
+2.   For two board, open minicom seperately, use rz -bZ command to transfer /bl_contl and /bl_car to "/home" on the Gumstix 
+     boards seperately.
+
+3.   setup bluetooth on both Gumstixs:
+     type "rfcomm -r connect 0 XX:XX:XX:XX:XX:XX 1&" in terminal. (XX:XX:XX:XX:XX:XX is MAC address of the other gumstix board)      
+
+4.   run the ./kernelpnic -qws& script and wait for GUI to show (Make sure that this program is backgrounded) on LCD Gumstix board.	
+
+5.   type "mknod /dev/IntelligentVehicle c 61 0" and then turn on the intelligent vehicle and type "insmod IntelligentVehicle" on 
+     Vehicle Gumstix board.
+
+6.   type "./bl_contl" in terminal on LCD Gumstix board and type "./bl_car" in terminal on Vehicle Gumstix board.
+
+7.   Now you can draw a route on the screen and push "send" buttom and you will see the intelligent vehicle run based on your route.

@@ -1,0 +1,34 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main(int argc, char **argv) {
+	int pFile;
+	FILE * obstacle;
+	int rfcomm;
+	char buf[1024], buff[1024];
+
+	
+	rfcomm = open("/dev/rfcomm0", O_RDWR);
+
+	while(1) {
+		pFile = open("/dev/posdata.txt", O_RDWR);
+		if (pFile >= 0) {
+			read(pFile, buff, sizeof(buff);
+			write(rfcomm, buff, sizeof(buff));
+			close(pFile);
+		}
+
+		read(rfcomm, buf, sizeof(buf));
+		if (buf[0] == 'O'){
+			obstacle = fopen("/home/Location.txt", "w+");
+			printf("%s", buf);
+			fwrite(buf, sizeof(buf), 1, obstacle);
+			fclose(obstacle);
+		}
+		
+	}
+	
+	close(rfcomm);
+	return 0;
+}

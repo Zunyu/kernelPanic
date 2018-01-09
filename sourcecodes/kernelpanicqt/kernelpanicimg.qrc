@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>rsc.qrc</file>
+        <file>KernelPanicImg.png</file>
+        <file>btn.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>locationDlg</class>
+ <widget class="QDialog" name="locationDlg">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-image: url(:/KernelPanicImg.png);</string>
+  </property>
+  <widget class="QPushButton" name="backbtn">
+   <property name="geometry">
+    <rect>
+     <x>120</x>
+     <y>120</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-image: url(:/btn.png);
+color: rgb(45, 255, 59);</string>
+   </property>
+   <property name="text">
+    <string>Panic!</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>backbtn</sender>
+   <signal>clicked()</signal>
+   <receiver>locationDlg</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>176</x>
+     <y>195</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>149</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
